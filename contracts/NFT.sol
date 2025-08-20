@@ -11,16 +11,30 @@ contract VeritixTicket is ERC721URIStorage, Ownable {
         string name;       // Nama event
         string location;   // Lokasi event
         string date;       // Tanggal event
-        uint256 price;     // Harga tiket (dalam wei)
-        uint256 maxSupply; // Maksimal tiket untuk event ini
+        bool exists;       // Flag kalau event ada
+    }
+
+    struct TicketCategory {
+        string name;       // Nama kategori (Cat 1, Cat 2, VIP, dll)
+        uint256 price;     // Harga tiket
+        uint256 maxSupply; // Maksimal tiket kategori ini
         uint256 sold;      // Jumlah tiket terjual
     }
 
-    // Mapping eventId => EventInfo
+    // eventId => EventInfo
     mapping(uint256 => EventInfo) public events;
 
-    // Mapping ticketId => eventId
+    // eventId => (categoryId => TicketCategory)
+    mapping(uint256 => mapping(uint256 => TicketCategory)) public categories;
+
+    // Simpan jumlah kategori per event
+    mapping(uint256 => uint256) public categoryCount;
+
+    // ticketId => eventId
     mapping(uint256 => uint256) public ticketToEvent;
+
+    // ticketId => categoryId
+    mapping(uint256 => uint256) public ticketToCategory;
 
     uint256 public nextEventId;
 
@@ -33,36 +47,64 @@ contract VeritixTicket is ERC721URIStorage, Ownable {
     function createEvent(
         string memory _name,
         string memory _location,
-        string memory _date,
-        uint256 _price,
-        uint256 _maxSupply
+        string memory _date
     ) external onlyOwner {
         events[nextEventId] = EventInfo({
             name: _name,
             location: _location,
             date: _date,
+            exists: true
+        });
+        nextEventId++;
+    }
+
+    /// @notice Tambah kategori tiket ke event
+    function addCategory(
+        uint256 eventId,
+        string memory _name,
+        uint256 _price,
+        uint256 _maxSupply
+    ) external onlyOwner {
+        require(events[eventId].exists, "Event tidak ada");
+        require(_maxSupply > 0, "Max supply harus > 0");
+
+        uint256 catId = categoryCount[eventId] + 1;
+        categories[eventId][catId] = TicketCategory({
+            name: _name,
             price: _price,
             maxSupply: _maxSupply,
             sold: 0
         });
-
-        nextEventId++;
+        categoryCount[eventId] = catId;
     }
 
-    /// @notice Beli tiket untuk event tertentu
-    function buyTicket(uint256 eventId, string memory tokenURI) external payable {
-        EventInfo storage e = events[eventId];
-        require(e.maxSupply > 0, "Event tidak ada");
-        require(e.sold < e.maxSupply, "Tiket habis");
-        require(msg.value == e.price, "Harga salah");
+    /// @notice Beli tiket berdasarkan kategori
+    function buyTicket(
+        uint256 eventId,
+        uint256 categoryId,
+        string memory tokenURI
+    ) external payable {
+        require(events[eventId].exists, "Event tidak ada");
+        TicketCategory storage cat = categories[eventId][categoryId];
+        require(cat.maxSupply > 0, "Kategori tidak ada");
+        require(cat.sold < cat.maxSupply, "Tiket kategori ini habis");
+        require(msg.value == cat.price, "Harga salah");
 
         uint256 ticketId = _nextTicketId;
         _safeMint(msg.sender, ticketId);
         _setTokenURI(ticketId, tokenURI);
 
         ticketToEvent[ticketId] = eventId;
-        e.sold++;
+        ticketToCategory[ticketId] = categoryId;
+
+        cat.sold++;
         _nextTicketId++;
+    }
+
+    /// @notice Update metadata URI tiket (hanya bisa owner/admin)
+    function updateTokenURI(uint256 ticketId, string memory newTokenURI) external onlyOwner {
+        require(_ownerOf(ticketId) != address(0), "Ticket tidak ada");
+        _setTokenURI(ticketId, newTokenURI);
     }
 
     /// @notice Tarik dana hasil jualan tiket
@@ -70,9 +112,14 @@ contract VeritixTicket is ERC721URIStorage, Ownable {
         payable(owner()).transfer(address(this).balance);
     }
 
-    /// @notice Dapatkan detail tiket dari ID
-    function getTicketInfo(uint256 ticketId) external view returns (EventInfo memory) {
+    /// @notice Ambil detail tiket (event + kategori)
+    function getTicketInfo(uint256 ticketId)
+        external
+        view
+        returns (EventInfo memory, TicketCategory memory)
+    {
         uint256 eventId = ticketToEvent[ticketId];
-        return events[eventId];
+        uint256 categoryId = ticketToCategory[ticketId];
+        return (events[eventId], categories[eventId][categoryId]);
     }
 }

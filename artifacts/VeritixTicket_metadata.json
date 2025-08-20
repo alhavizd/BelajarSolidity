@@ -264,6 +264,34 @@
 			{
 				"inputs": [
 					{
+						"internalType": "uint256",
+						"name": "eventId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_maxSupply",
+						"type": "uint256"
+					}
+				],
+				"name": "addCategory",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "address",
 						"name": "to",
 						"type": "address"
@@ -306,6 +334,11 @@
 						"type": "uint256"
 					},
 					{
+						"internalType": "uint256",
+						"name": "categoryId",
+						"type": "uint256"
+					},
+					{
 						"internalType": "string",
 						"name": "tokenURI",
 						"type": "string"
@@ -314,6 +347,64 @@
 				"name": "buyTicket",
 				"outputs": [],
 				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "categories",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxSupply",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "sold",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "categoryCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -332,16 +423,6 @@
 						"internalType": "string",
 						"name": "_date",
 						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_price",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_maxSupply",
-						"type": "uint256"
 					}
 				],
 				"name": "createEvent",
@@ -375,19 +456,9 @@
 						"type": "string"
 					},
 					{
-						"internalType": "uint256",
-						"name": "price",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "maxSupply",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "sold",
-						"type": "uint256"
+						"internalType": "bool",
+						"name": "exists",
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -440,6 +511,23 @@
 								"type": "string"
 							},
 							{
+								"internalType": "bool",
+								"name": "exists",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct VeritixTicket.EventInfo",
+						"name": "",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "name",
+								"type": "string"
+							},
+							{
 								"internalType": "uint256",
 								"name": "price",
 								"type": "uint256"
@@ -455,7 +543,7 @@
 								"type": "uint256"
 							}
 						],
-						"internalType": "struct VeritixTicket.EventInfo",
+						"internalType": "struct VeritixTicket.TicketCategory",
 						"name": "",
 						"type": "tuple"
 					}
@@ -661,6 +749,25 @@
 						"type": "uint256"
 					}
 				],
+				"name": "ticketToCategory",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
 				"name": "ticketToEvent",
 				"outputs": [
 					{
@@ -723,6 +830,24 @@
 					}
 				],
 				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "ticketId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "newTokenURI",
+						"type": "string"
+					}
+				],
+				"name": "updateTokenURI",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -888,14 +1013,20 @@
 		"userdoc": {
 			"kind": "user",
 			"methods": {
-				"buyTicket(uint256,string)": {
-					"notice": "Beli tiket untuk event tertentu"
+				"addCategory(uint256,string,uint256,uint256)": {
+					"notice": "Tambah kategori tiket ke event"
 				},
-				"createEvent(string,string,string,uint256,uint256)": {
+				"buyTicket(uint256,uint256,string)": {
+					"notice": "Beli tiket berdasarkan kategori"
+				},
+				"createEvent(string,string,string)": {
 					"notice": "Buat event baru"
 				},
 				"getTicketInfo(uint256)": {
-					"notice": "Dapatkan detail tiket dari ID"
+					"notice": "Ambil detail tiket (event + kategori)"
+				},
+				"updateTokenURI(uint256,string)": {
+					"notice": "Update metadata URI tiket (hanya bisa owner/admin)"
 				},
 				"withdraw()": {
 					"notice": "Tarik dana hasil jualan tiket"
@@ -1073,11 +1204,11 @@
 			]
 		},
 		"contracts/NFT.sol": {
-			"keccak256": "0xd108e95901ccbcb06def6f0acb8fa6e232ced06422fc55b4838b539755fc8440",
+			"keccak256": "0xe0a12fcfd19b68eac340044c0d6d6f376f8ab0b68759a94b0dbf998bb04e512d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://c9e89132b6d6fa8fdd99df8cd8a85b382dcc7683ec43d7be01be0d74795a08f4",
-				"dweb:/ipfs/QmdR7d53BynUBjnHuMoFkZKbEE6mZwyvEcU1QY7jiJM1dS"
+				"bzz-raw://9e96ce4b4861529c0770732a6ca243e8cc445410a29554c4a12bd2a7bb6a6135",
+				"dweb:/ipfs/QmXsthFCU7F9ukKYG3xAydrodt7HNGNZJ2AmHgYDJPoRjk"
 			]
 		}
 	},
