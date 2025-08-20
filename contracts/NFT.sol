@@ -78,7 +78,7 @@ contract VeritixTicket is ERC721URIStorage, Ownable {
         categoryCount[eventId] = catId;
     }
 
-    /// @notice Beli tiket berdasarkan kategori
+    /// @notice Beli tiket berdasarkan kategori (satu tiket)
     function buyTicket(
         uint256 eventId,
         uint256 categoryId,
@@ -99,6 +99,32 @@ contract VeritixTicket is ERC721URIStorage, Ownable {
 
         cat.sold++;
         _nextTicketId++;
+    }
+
+    /// @notice Beli banyak tiket sekaligus (batch purchase)
+    function buyMultipleTickets(
+        uint256 eventId,
+        uint256 categoryId,
+        string[] memory tokenURIs
+    ) external payable {
+        require(events[eventId].exists, "Event tidak ada");
+        TicketCategory storage cat = categories[eventId][categoryId];
+        require(cat.maxSupply > 0, "Kategori tidak ada");
+        require(cat.sold + tokenURIs.length <= cat.maxSupply, "Tidak cukup tiket tersedia");
+        require(msg.value == cat.price * tokenURIs.length, "Harga salah");
+
+        for (uint256 i = 0; i < tokenURIs.length; i++) {
+            uint256 ticketId = _nextTicketId;
+            _safeMint(msg.sender, ticketId);
+            _setTokenURI(ticketId, tokenURIs[i]);
+
+            ticketToEvent[ticketId] = eventId;
+            ticketToCategory[ticketId] = categoryId;
+
+            _nextTicketId++;
+        }
+
+        cat.sold += tokenURIs.length;
     }
 
     /// @notice Update metadata URI tiket (hanya bisa owner/admin)

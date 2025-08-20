@@ -339,6 +339,29 @@
 						"type": "uint256"
 					},
 					{
+						"internalType": "string[]",
+						"name": "tokenURIs",
+						"type": "string[]"
+					}
+				],
+				"name": "buyMultipleTickets",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "eventId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "categoryId",
+						"type": "uint256"
+					},
+					{
 						"internalType": "string",
 						"name": "tokenURI",
 						"type": "string"
@@ -1016,8 +1039,11 @@
 				"addCategory(uint256,string,uint256,uint256)": {
 					"notice": "Tambah kategori tiket ke event"
 				},
+				"buyMultipleTickets(uint256,uint256,string[])": {
+					"notice": "Beli banyak tiket sekaligus (batch purchase)"
+				},
 				"buyTicket(uint256,uint256,string)": {
-					"notice": "Beli tiket berdasarkan kategori"
+					"notice": "Beli tiket berdasarkan kategori (satu tiket)"
 				},
 				"createEvent(string,string,string)": {
 					"notice": "Buat event baru"
@@ -1204,11 +1230,11 @@
 			]
 		},
 		"contracts/NFT.sol": {
-			"keccak256": "0xe0a12fcfd19b68eac340044c0d6d6f376f8ab0b68759a94b0dbf998bb04e512d",
+			"keccak256": "0xf20c959641b6f6a24849838692d4ee9df04b9909c0f4b5b7ff3decd4e254b11d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9e96ce4b4861529c0770732a6ca243e8cc445410a29554c4a12bd2a7bb6a6135",
-				"dweb:/ipfs/QmXsthFCU7F9ukKYG3xAydrodt7HNGNZJ2AmHgYDJPoRjk"
+				"bzz-raw://933aac5aef1611b4c61e4fc894168b5ce5e01165b640147d3a5539f6e50a709f",
+				"dweb:/ipfs/QmXrNZi5iGLtrU5fPfu42vdUb3A7tgjjpxWoxfEXjxm8qQ"
 			]
 		}
 	},
